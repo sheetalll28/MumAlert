@@ -24,11 +24,11 @@ class PostureDetector:
         slouch_threshold = self.baseline_h_scaled_threshold(self.baseline_w)
         if y - self.baseline_y > slouch_threshold:
             return True, "Slouching / Hunched over"
-        if w > self.baseline_w * 1.4:
+        if w > self.baseline_w * 1.2:
             return True, "Leaning too close to screen"
         return False, "Good Posture"
     def baseline_h_scaled_threshold(self, width):
-        return width * 0.5
+        return width * 0.25
     def reset_calibration(self):
         """
         Call this if the user manually resets their position.
