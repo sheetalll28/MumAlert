@@ -6,3 +6,4 @@ mediapipe==0.10.9
 streamlit==1.32.2
 streamlit-webrtc==0.47.0
 pyttsx3==2.90
+moviepy==1.0.3
