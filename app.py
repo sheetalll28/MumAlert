@@ -187,14 +187,20 @@ if "hydration_message" not in st.session_state:
     st.session_state.hydration_message = "Hey! Don't forget to drink some water. Stay hydrated!"
 if "last_hydration_time" not in st.session_state:
     st.session_state.last_hydration_time = time.time()
+if "emotion_enabled" not in st.session_state:
+    st.session_state.emotion_enabled = True
+if "posture_enabled" not in st.session_state:
+    st.session_state.posture_enabled = True
 
 # ==========================================
 # WEBRTC VIDEO PROCESSOR
 # ==========================================
 class VideoProcessor(VideoTransformerBase):
     def __init__(self):
-        self.detector        = EmotionDetector()
-        self.posture_detector = PostureDetector()
+        # Lazy-loaded to avoid blocking WebRTC offer processing (10s timeout)
+        self.detector        = None
+        self.posture_detector = None
+        self._models_loaded  = False
 
         self.PERSISTENCE_THRESHOLD = 3.0
         self.POSTURE_THRESHOLD     = 3.0
@@ -206,9 +212,21 @@ class VideoProcessor(VideoTransformerBase):
         self.last_negative_time    = None
         self.last_alert_time       = 0.0
 
+        # Public flags — updated from UI via ctx.video_processor
+        self.emotion_enabled = True
+        self.posture_enabled = True
+
         self.alert_queue = queue.Queue()
 
+    def _load_models(self):
+        """Load heavy models on first frame to avoid WebRTC timeout."""
+        if not self._models_loaded:
+            self.detector         = EmotionDetector()
+            self.posture_detector = PostureDetector()
+            self._models_loaded   = True
+
     def transform(self, frame):
+        self._load_models()
         img = frame.to_ndarray(format="bgr24")
         img = cv2.resize(img, (1280, 720))
         img = cv2.flip(img, 1)
@@ -229,36 +247,42 @@ class VideoProcessor(VideoTransformerBase):
                 cv2.putText(img, f"{dominant_emotion} ({score:.2f})", (x, y - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 210, 0), 2)
 
-            # --- POSTURE ---
-            if is_bad_posture:
-                system_status = f"Bad Posture: {posture_reason}"
-                self.last_bad_posture_time = current_time
-                if self.bad_posture_start_time is None:
-                    self.bad_posture_start_time = current_time
-                elif (current_time - self.bad_posture_start_time) >= self.POSTURE_THRESHOLD:
-                    if not in_cooldown:
-                        self.alert_queue.put("posture")
-                        self.last_alert_time = current_time
+            # --- POSTURE (only if enabled) ---
+            if self.posture_enabled:
+                if is_bad_posture:
+                    system_status = f"Bad Posture: {posture_reason}"
+                    self.last_bad_posture_time = current_time
+                    if self.bad_posture_start_time is None:
+                        self.bad_posture_start_time = current_time
+                    elif (current_time - self.bad_posture_start_time) >= self.POSTURE_THRESHOLD:
+                        if not in_cooldown:
+                            self.alert_queue.put("posture")
+                            self.last_alert_time = current_time
+                            self.bad_posture_start_time = None
+                else:
+                    if self.last_bad_posture_time and (current_time - self.last_bad_posture_time) > 1.5:
                         self.bad_posture_start_time = None
             else:
-                if self.last_bad_posture_time and (current_time - self.last_bad_posture_time) > 1.5:
-                    self.bad_posture_start_time = None
+                self.bad_posture_start_time = None
 
-            # --- EMOTION ---
-            if dominant_emotion and self.detector.is_negative(dominant_emotion):
-                if not is_bad_posture:
-                    system_status = f"Negative Emotion: {dominant_emotion}"
-                self.last_negative_time = current_time
-                if self.negative_start_time is None:
-                    self.negative_start_time = current_time
-                elif (current_time - self.negative_start_time) >= self.PERSISTENCE_THRESHOLD:
-                    if not in_cooldown:
-                        self.alert_queue.put("stress")
-                        self.last_alert_time = current_time
+            # --- EMOTION (only if enabled) ---
+            if self.emotion_enabled:
+                if dominant_emotion and self.detector.is_negative(dominant_emotion):
+                    if not is_bad_posture:
+                        system_status = f"Negative Emotion: {dominant_emotion}"
+                    self.last_negative_time = current_time
+                    if self.negative_start_time is None:
+                        self.negative_start_time = current_time
+                    elif (current_time - self.negative_start_time) >= self.PERSISTENCE_THRESHOLD:
+                        if not in_cooldown:
+                            self.alert_queue.put("stress")
+                            self.last_alert_time = current_time
+                            self.negative_start_time = None
+                else:
+                    if self.last_negative_time and (current_time - self.last_negative_time) > 1.0:
                         self.negative_start_time = None
             else:
-                if self.last_negative_time and (current_time - self.last_negative_time) > 1.0:
-                    self.negative_start_time = None
+                self.negative_start_time = None
 
         if in_cooldown:
             alert_visual = "COOLDOWN ACTIVE"
@@ -295,13 +319,28 @@ with cam_col:
 
 with ctrl_col:
 
+    # --- Active Modules Toggles ---
+    st.markdown('<div class="section-heading">⚙️ Active Modules</div>', unsafe_allow_html=True)
+    emotion_enabled = st.toggle("😤 Emotion Alerts", value=st.session_state.emotion_enabled, key="toggle_emotion")
+    posture_enabled = st.toggle("🪑 Posture Alerts", value=st.session_state.posture_enabled, key="toggle_posture")
+    hydration_enabled = st.toggle("💧 Hydration Reminders", value=True, key="toggle_hydration")
+
+    # Sync toggle state to session and live video processor
+    st.session_state.emotion_enabled = emotion_enabled
+    st.session_state.posture_enabled = posture_enabled
+    st.session_state.hydration_enabled = hydration_enabled
+    if ctx.state.playing and ctx.video_processor:
+        ctx.video_processor.emotion_enabled = emotion_enabled
+        ctx.video_processor.posture_enabled = posture_enabled
+
     # --- Status Metrics ---
     st.markdown('<div class="section-heading">📊 Monitor Status</div>', unsafe_allow_html=True)
-    st.markdown("""
+    def _badge(on): return "🟢" if on else "🔴"
+    st.markdown(f"""
     <div class="metric-row">
-        <div class="metric-card"><div class="icon">😤</div><div class="label">Stress Watch</div></div>
-        <div class="metric-card"><div class="icon">🪑</div><div class="label">Posture Watch</div></div>
-        <div class="metric-card"><div class="icon">💧</div><div class="label">Hydration Watch</div></div>
+        <div class="metric-card"><div class="icon">{_badge(emotion_enabled)}😤</div><div class="label">Stress Watch</div></div>
+        <div class="metric-card"><div class="icon">{_badge(posture_enabled)}🪑</div><div class="label">Posture Watch</div></div>
+        <div class="metric-card"><div class="icon">{_badge(hydration_enabled)}💧</div><div class="label">Hydration Watch</div></div>
     </div>
     """, unsafe_allow_html=True)
 

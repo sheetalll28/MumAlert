@@ -1,4 +1,11 @@
-# Emotion-Aware Smart Study Assistant
+# 💛 MumAlert - Real-Time Posture, Stress & Hydration Monitoring System
+
+## The Feeling
+You know how your mum always knew when you were stressed, sitting wrong, or hadn't had water in hours - even before you did?
+
+**MumAlert** is that feeling, built into your screen. It watches over you while you study, gently nudging you to sit up straight, take a breath, and stay hydrated - just like she would.
+
+Because sometimes, all you need is a quiet reminder that someone cares.
 
 ## Abstract
 Continuous studying often leads to fatigue, stress, and burnout, which negatively affect a student's learning efficiency. The "Emotion-Aware Smart Study Assistant" is an intelligent software-based prototype that addresses this problem by monitoring the student's facial expressions in real time using a standard webcam. By applying deep learning-based Facial Emotion Recognition (FER), the system categorizes the user's emotional state (e.g., happy, neutral, sad, angry). If negative emotions persist beyond a predefined threshold, the assistant proactively intervenes with a soft, text-to-speech audio alert encouraging the student to take a break or hydrate. The system includes cooldown mechanisms to prevent annoyance and meticulously logs all emotional states for future analysis.
@@ -6,23 +13,14 @@ Continuous studying often leads to fatigue, stress, and burnout, which negativel
 ## Novelty Statement
 Unlike traditional wellness apps that rely on manual user inputs or fixed timers (like the Pomodoro technique), this system introduces an adaptive, non-intrusive approach to mental wellbeing. It dynamically responds to the *actual* cognitive and emotional state of the user in real-time. The core novelty lies in the localized, threshold-based persistence logic that ensures interventions only happen when genuinely needed, significantly reducing false positives from transient facial expressions.
 
-## Text-Based Architecture Diagram
-```mermaid
-graph TD
-    A[Webcam Input] --> B[OpenCV Frame Capture]
-    B --> C["Facial Emotion Recognition Model (FER)"]
-    C -->|Detects Happy/Neutral| D[Update Display & Log]
-    C -->|Detects Sad/Angry/Fear| E[Persistence Timer Started]
-    
-    E --> F["Negative Emotion > 3 seconds?"]
-    F -->|No| D
-    F -->|Yes| G{In Cooldown Period?}
-    
-    G -->|Yes| D
-    G -->|No| H["Trigger Audio Alert - pyttsx3 Thread"]
-    H --> I[Reset Timer & Enter Cooldown]
-    I --> D
-```
+## System Architecture & Pipeline
+
+![MumAlert Complete Processing Pipeline](pipeline.png)
+
+The system features three independent, parallel processing pipelines:
+- **Emotion Detection**: Monitors facial expressions and triggers alerts for persistent negative emotions
+- **Posture Detection**: Analyzes body posture and alerts when slouching or misalignment is detected
+- **Hydration Tracking**: Time-based and stress-triggered reminders to stay hydrated
 
 ## Setup and Run Instructions
 
