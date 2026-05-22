@@ -258,8 +258,13 @@ class VideoProcessor(VideoTransformerBase):
         system_status = "Monitoring..."
         alert_visual  = ""
 
-        dominant_emotion, score, box = self.detector.detect_emotion(img)
-        is_bad_posture, posture_reason = self.posture_detector.check_posture(box)
+        try:
+            dominant_emotion, score, box = self.detector.detect_emotion(img)
+            is_bad_posture, posture_reason = self.posture_detector.check_posture(box)
+        except Exception as e:
+            print(f"[ERROR in VideoProcessor]: {e}")
+            dominant_emotion, score, box = None, 0.0, None
+            is_bad_posture, posture_reason = False, "Model inference error"
 
         if box is not None:
             x, y, w, h = box
@@ -336,7 +341,10 @@ with cam_col:
             },
             "audio": False
         },
-        async_processing=True
+        async_processing=True,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        }
     )
 
 with ctrl_col:

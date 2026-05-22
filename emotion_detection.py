@@ -8,7 +8,7 @@ except ImportError:
 from fer import FER
 class EmotionDetector:
     def __init__(self):
-        self.detector = FER(mtcnn=True)
+        self.detector = FER(mtcnn=False)
         self.target_emotions = ["happy", "neutral", "sad", "angry", "fear", "surprise", "disgust"]
         self.negative_emotions = ["sad", "angry", "fear", "disgust"]
     def detect_emotion(self, frame):
