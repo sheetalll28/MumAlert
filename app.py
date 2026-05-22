@@ -204,7 +204,7 @@ def speak_in_browser(text):
 # SESSION STATE — hydration settings
 # ==========================================
 if "hydration_interval" not in st.session_state:
-    st.session_state.hydration_interval = 1          # seconds (1s for testing)
+    st.session_state.hydration_interval = 20          # minutes
 if "hydration_message" not in st.session_state:
     st.session_state.hydration_message = "Hey! Don't forget to drink some water. Stay hydrated!"
 if "last_hydration_time" not in st.session_state:
@@ -392,19 +392,18 @@ with ctrl_col:
     )
     st.session_state.hydration_message = hydration_message
 
-    # Slider: 1s for testing, up to 45 minutes. Default = 1s for now.
-    # For real use, a good value is 1200–1800 seconds (20–30 minutes).
+    # Slider: 1 min for testing, up to 60 minutes. Default = 20 min.
     hydration_interval = st.slider(
-        "Remind me every (seconds)",
+        "Remind me every (minutes)",
         min_value=1,
-        max_value=2700,            # 45 minutes max
+        max_value=60,            # 60 minutes max
         value=st.session_state.hydration_interval,
         step=1,
-        help="Set to 1s for testing. For real study sessions, 1200–1800s (20–30 min) is ideal."
+        help="Set to 1m for testing. For real study sessions, 20–30 min is ideal."
     )
     st.session_state.hydration_interval = hydration_interval
-    st.caption(f"⏱ Currently set to every **{hydration_interval}s** — "
-               f"{'🧪 Testing mode' if hydration_interval < 30 else '✅ Real-time mode'}")
+    st.caption(f"⏱ Currently set to every **{hydration_interval} min** — "
+               f"{'🧪 Testing mode' if hydration_interval < 3 else '✅ Real-time mode'}")
 
     # --- Logs ---
     st.markdown('<div class="section-heading">🔔 Alert Log</div>', unsafe_allow_html=True)
@@ -424,7 +423,7 @@ if ctx.state.playing:
         now = time.time()
 
         # --- Hydration timer (runs independently from WebRTC) ---
-        if (now - st.session_state.last_hydration_time) >= st.session_state.hydration_interval:
+        if (now - st.session_state.last_hydration_time) >= (st.session_state.hydration_interval * 60):
             speak_in_browser(st.session_state.hydration_message)
             log_placeholder.markdown(
                 f'<div class="alert-log">💧 <strong>Hydration Reminder:</strong> {st.session_state.hydration_message}</div>',
