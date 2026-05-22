@@ -1,4 +1,4 @@
-setuptools>=70.0.0
+setuptools<70.0.0
 opencv-python-headless==4.8.1.78
 fer==22.5.1
 tensorflow-cpu==2.15.0

@@ -3,7 +3,7 @@ import subprocess, sys, importlib
 try:
     import pkg_resources
 except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools<70.0.0"])
     importlib.invalidate_caches()
 from fer import FER
 class EmotionDetector:
