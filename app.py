@@ -30,6 +30,15 @@ html, body, [class*="css"] {
     color: #f0f0f0;
 }
 
+/* Ensure widget labels, toggle texts, and other control texts are bright and visible */
+div[data-testid="stWidgetLabel"],
+div[data-testid="stWidgetLabel"] p,
+label,
+span[data-testid="stWidgetLabel"] {
+    color: #f8f9fa !important;
+    font-weight: 500 !important;
+}
+
 /* Hero header */
 .hero-title {
     font-size: 2.6rem;
