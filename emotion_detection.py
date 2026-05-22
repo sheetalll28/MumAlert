@@ -1,4 +1,10 @@
 import cv2
+import subprocess, sys, importlib
+try:
+    import pkg_resources
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+    importlib.invalidate_caches()
 from fer import FER
 class EmotionDetector:
     def __init__(self):
