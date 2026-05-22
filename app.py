@@ -150,6 +150,12 @@ header    { visibility: hidden; }
     font-weight: 600;
     letter-spacing: 0.01em;
 }
+/* Make Streamlit toggle label text bright yellow for visibility */
+[data-testid="stToggle"] label, .stToggle label {
+    color: #ffd700 !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
 </style>
 """, unsafe_allow_html=True)
 
