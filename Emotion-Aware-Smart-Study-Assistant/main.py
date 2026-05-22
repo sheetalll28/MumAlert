@@ -98,7 +98,7 @@ class SmartStudyApp:
 
         # Open Webcam securely
         self.cap = None
-        for target_index in [0, 1, 2]:
+        for target_index in [1, 2, 0]:
             temp_cap = cv2.VideoCapture(target_index, cv2.CAP_DSHOW)
             if temp_cap.isOpened():
                 ret, frame = temp_cap.read()
