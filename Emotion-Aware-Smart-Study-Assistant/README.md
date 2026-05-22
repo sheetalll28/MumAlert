@@ -1,4 +1,11 @@
-# MummyAlert - Real-Time Posture, Stress & Hydration Monitoring System
+# 💛 MumAlert - Real-Time Posture, Stress & Hydration Monitoring System
+
+## The Feeling
+You know how your mum always knew when you were stressed, sitting wrong, or hadn't had water in hours - even before you did?
+
+**MumAlert** is that feeling, built into your screen. It watches over you while you study, gently nudging you to sit up straight, take a breath, and stay hydrated - just like she would.
+
+Because sometimes, all you need is a quiet reminder that someone cares.
 
 ## Abstract
 Continuous studying often leads to fatigue, stress, and burnout, which negatively affect a student's learning efficiency. The "Emotion-Aware Smart Study Assistant" is an intelligent software-based prototype that addresses this problem by monitoring the student's facial expressions in real time using a standard webcam. By applying deep learning-based Facial Emotion Recognition (FER), the system categorizes the user's emotional state (e.g., happy, neutral, sad, angry). If negative emotions persist beyond a predefined threshold, the assistant proactively intervenes with a soft, text-to-speech audio alert encouraging the student to take a break or hydrate. The system includes cooldown mechanisms to prevent annoyance and meticulously logs all emotional states for future analysis.
