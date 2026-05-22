@@ -4,35 +4,7 @@ This document traces the engineering path of **MumAlert**, detailing the transit
 
 ---
 
-## 🗺️ Architectural Overview
 
-The core mission of **MumAlert** is to act as a gentle, ambient guardian that monitors your **posture**, **stress levels (emotions)**, and **hydration** in real time, mimicking a parent's caring watch.
-
-```mermaid
-flowchart TD
-    subgraph Browser (Client Side)
-        Camera[User Camera Feed] -->|HTML5 Capture| WebRTC[WebRTC Client]
-        BrowserTTS[Web Speech Synthesis] <==|Dynamic JS Injection| BrowserEngine[Audio Alert Output]
-    end
-
-    subgraph Streamlit Cloud (Server Side)
-        WebRTC -->|Secure WebRTC Stream| Streamer[streamlit-webrtc]
-        Streamer -->|RGB Frame Array| Pipeline[Processing Pipeline]
-        
-        subgraph Pipeline Modules
-            FaceDet[Haar Cascade Face Detector] -->|Face Bounding Box| Emotion[FER Neural Net Engine]
-            FaceDet -->|Box Geometry| Posture[Relative Position Engine]
-        end
-        
-        Emotion -->|Stress Flag| Decision[Inference & Alert Logic]
-        Posture -->|Slouch Flag| Decision
-        
-        Decision -->|Alert Event| AlertQueue[Async Alert Queue]
-        AlertQueue -->|JS Code payload| BrowserEngine
-    end
-```
-
----
 
 ## 🔄 1. The Great Pivot: Desktop GUI to Deployed Web App
 
