@@ -1,5 +1,7 @@
 # 💛 MumAlert - Real-Time Posture, Stress & Hydration Monitoring System
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_svg.svg)](https://mumalert-padhlebeta.streamlit.app/)
+
 ## The Feeling
 You know how your mum always knew when you were stressed, sitting wrong, or hadn't had water in hours - even before you did?
 
