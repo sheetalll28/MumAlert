@@ -53,6 +53,7 @@ html, body, [class*="css"] {
     background: rgba(255,255,255,0.05);
     border-left: 4px solid #ffd200;
     border-radius: 10px;
+    border-radius: 10px;
     padding: 18px 22px;
     margin-bottom: 24px;
     line-height: 1.8;
@@ -143,6 +144,12 @@ div[data-testid="stAlert"] {
 #MainMenu { visibility: hidden; }
 footer    { visibility: hidden; }
 header    { visibility: hidden; }
+/* Make Streamlit toggle label text bright for visibility */
+[data-testid="stToggle"] label, .stToggle label {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
 </style>
 """, unsafe_allow_html=True)
 
