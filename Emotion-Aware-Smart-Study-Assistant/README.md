@@ -13,23 +13,14 @@ Continuous studying often leads to fatigue, stress, and burnout, which negativel
 ## Novelty Statement
 Unlike traditional wellness apps that rely on manual user inputs or fixed timers (like the Pomodoro technique), this system introduces an adaptive, non-intrusive approach to mental wellbeing. It dynamically responds to the *actual* cognitive and emotional state of the user in real-time. The core novelty lies in the localized, threshold-based persistence logic that ensures interventions only happen when genuinely needed, significantly reducing false positives from transient facial expressions.
 
-## Text-Based Architecture Diagram
-```mermaid
-graph TD
-    A[Webcam Input] --> B[OpenCV Frame Capture]
-    B --> C{Facial Emotion Recognition Model (FER)}
-    C -->|Detects Happy/Neutral| D[Update Display & Log]
-    C -->|Detects Sad/Angry/Fear| E[Persistence Timer Started]
-    
-    E --> F{Negative Emotion > 3 seconds?}
-    F -->|No| D
-    F -->|Yes| G{In Cooldown Period?}
-    
-    G -->|Yes| D
-    G -->|No| H[Trigger Audio Alert - pyttsx3 Thread]
-    H --> I[Reset Timer & Enter Cooldown]
-    I --> D
-```
+## System Architecture & Pipeline
+
+![MumAlert Complete Processing Pipeline](pipeline.png)
+
+The system features three independent, parallel processing pipelines:
+- **Emotion Detection**: Monitors facial expressions and triggers alerts for persistent negative emotions
+- **Posture Detection**: Analyzes body posture and alerts when slouching or misalignment is detected
+- **Hydration Tracking**: Time-based and stress-triggered reminders to stay hydrated
 
 ## Setup and Run Instructions
 
